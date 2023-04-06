@@ -98,25 +98,25 @@ on my laptop.
 There are a number of other files containing utilities, experiments, etc.
 
 - scene reconstruction
-  - core/main.cpp               main loop for scene reconstruction
-  - core/blob.cpp               blob data structure (a blob is a connected set of occupied voxels)
-  - core/fusion.cpp             construct the set of blobs from the image data
+  - [`core/main.cpp`](./core/main.cpp): main loop for scene reconstruction
+  - [`core/blob.cpp`](./core/blob.cpp): blob data structure (a blob is a connected set of occupied voxels)
+  - [`core/fusion.cpp`](./core/fusion.cpp): construct the set of blobs from the image data
 
 - GUI
-  - core/display.cpp            GLFW code for the GUI
-  - core/render.cpp             draw a perspective view of the blobs
+  - [`core/display.cpp`](./core/display.cpp): GLFW code for the GUI
+  - [`core/render.cpp`](./core/render.cpp): draw a perspective view of the blobs
 
 - precomutation of voxel data
-  - static/voxel-data-app.cpp   reads in background images and writes out voxel data
-  - static/voxel-data.cpp       determine with camera rays hit which voxels (uses util/raster.cpp)
+  - [`static/voxel-data-app.cpp`](./static/voxel-data-app.cpp):  reads in background images and writes out voxel data
+  - [`static/voxel-data.cpp`](./static/voxel-data.cpp): determine with camera rays hit which voxels (uses util/raster.cpp`](./)
 
 - simulation
-  - sim/main.cpp                main loop for the simulation app
-  - util/raster.cpp             create camera images from triangle meshes
-  - robot/robot.cpp             calculating a robot's pose from joint angles
-  - robot/urdf.cpp              reading unified robotics description formaf (URDF) files
-  - static/mesh-app.cpp         generating STL files for backgrounds and objects
+  - [`sim/main.cpp`](./sim/main.cpp): main loop for the simulation app
+  - [`util/raster.cpp`](./util/raster.cpp): create camera images from triangle meshes
+  - [`robot/robot.cpp`](./robot/robot.cpp): calculating a robot's pose from joint angles
+  - [`robot/urdf.cpp`](./robot/urdf.cpp): reading unified robotics description formaf (URDF) files
+  - [`static/mesh-app.cpp`](./static/mesh-app.cpp): generating STL files for backgrounds and objects
 
 - communication
-  - camera/camera.cpp           sending and receiving depth images
-  - util/command.cpp            the core and simulation communicate via serial commands
+  - [`camera/camera.cpp`](./camera/camera.cpp): sending and receiving depth images
+  - [`util/command.cpp`](./util/command.cpp): the core and simulation communicate via serial commands
