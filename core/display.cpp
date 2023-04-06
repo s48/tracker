@@ -22,7 +22,7 @@
 #include <functional>
 
 #include <unistd.h>
-#include <sys/types.h>
+#include <wait.h>
 #include <signal.h>
 
 // Socket connections for sending commands.
@@ -130,12 +130,31 @@ void updateFloorPixels(const std::vector<uint32_t>& floorImageData)
 // use glReadPixels() to get the displayed pixels but in practice this
 // only works some of the time.  Instead this redraws the image in a
 // separate frame buffer and then writes out its pixels.
+//
+// A much simpler way is to run "import -window root foo.png".
+
+static uint32_t captureCount = 0;
+
+void screenCapture() {
+  std::string filename = "capture" + std::to_string(captureCount) + ".png";
+  captureCount += 1;
+  int childPid = fork();
+  if (childPid == 0) {
+    if (execl("/usr/bin/import", "/usr/bin/import",
+              "-window", "root",
+              filename.c_str(),
+              NULL) < 0) {
+      fprintf(stderr, "exec ffmpeg failed\n");
+    }
+  } else {
+    waitpid(childPid, NULL, 0);
+  }
+}
 
 static void drawWindow(uint32_t width, uint32_t height, bool refresh);
-static uint32_t captureCount = 0;
 static const uint32_t glRgbaBytes = 4; // GL_RGBA is four bytes per pixel
 
-void screenCapture()
+void screenCapture0()
 {
     static GLuint framebuffer = 0;
     glGenFramebuffers(1, &framebuffer);
@@ -390,8 +409,25 @@ void keyCallback(GLFWwindow*, // window
         printBlobs = true;
         break;
     case GLFW_KEY_C:
+      if (! (modifiers & GLFW_MOD_SHIFT)) {
         screenCapture();
-        break;
+      } else if (0 < moviePid) {
+       kill(moviePid, SIGTERM);
+      } else {
+        moviePid = fork();
+        if (moviePid == 0) {
+          if (execl("/usr/bin/ffmpeg", "/usr/bin/ffmpeg",
+                    "-video_size", "1920x1080",
+                    "-framerate", "25",
+                    "-f", "x11grab",
+                    "-i", ":0.0",
+                    "screen-grab.mp4",
+                    NULL) < 0) {
+            fprintf(stderr, "exec ffmpeg failed\n");
+          }
+        }
+      }
+      break;
     case GLFW_KEY_D:
         debugPrint = ! debugPrint;
         if (debugPrint) {
@@ -415,24 +451,6 @@ void keyCallback(GLFWwindow*, // window
         robotSpriteLevel = (robotSpriteLevel + 1) % 3;
         sendCommand(displayToCoreFd, "sprite", {robotSpriteLevel});
         break;
-    case GLFW_KEY_H:
-      if (0 < moviePid) {
-       kill(moviePid, SIGTERM);
-      } else {
-        moviePid = fork();
-        if (moviePid == 0) {
-          if (execl("/usr/bin/ffmpeg", "/usr/bin/ffmpeg",
-                    "-video_size", "1920x1080",
-                    "-framerate", "25",
-                    "-f", "x11grab",
-                    "-i", ":0.0",
-                    "screen-grab.mp4",
-                    NULL) < 0) {
-            fprintf(stderr, "exec ffmpeg failed\n");
-          }
-        }
-      }
-      break;
     case GLFW_KEY_L:
         // Rotate between layer, layerBlobs, and layerCoverage.
         floorShow = (floorShow == Show::layer

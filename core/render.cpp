@@ -1,6 +1,7 @@
 // Copyright (c) 2022 Richard Kelsey. All rights reserved.
 
-// Render a perspective view of the blobs.
+// Render a perspective view of the blobs.  This is simple and slow, but
+// there is no particular reason to make it fast.
 
 #include "blob.hpp"
 #include "constant.hpp"

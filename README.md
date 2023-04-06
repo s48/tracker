@@ -1,14 +1,36 @@
 
-This is a system that uses images from time-of-flight cameras to track robots and people.
+This is a system that uses images from time-of-flight cameras to track robots and people
+and also a simulation platform for experimenting with that sort of thing.
 
-The main idea is that most of the volume seen by the cameras is empty, so we
+The main idea for efficiency is that most of the volume seen by the cameras is empty, so we
 want to spend as little time as possible on empty voxels.  Once a voxel has been
 determined to be empty we do not want to visit it again.  This is reflected
 in two ways.  The first is that when incorporating a
 pixel depth from a new image we only examine the voxels that lie between the
 new measurement and the previous one.   The other is that the reconstructed
 3D scene is represented as a set of vertical intervals of non-empty voxels.
-This is no direct representation of empty voxels.
+Empty voxels are only represented by their absence.
+
+## Screen shots
+
+Here are two screenshots, one of the ![perspective display](./screenshots/display.png) and the
+other showing a ![raw simulated image](./screenshots/camera.png).  There is also an 
+![MP4 capture](./screenshots/demo.mp4).  The scene contains a robot,
+a person, and some tables and shelves.  In both there are eight camera
+image thumbnails along the bottom and a top-down map at the upper right.  The voxels are
+5cm on a side.
+
+In the perspective
+view gray voxels are unmoving background objects, including the robots base, and blue are the
+robot's position as derived from its joint angles.  Small chunks of unoccupied voxels are green
+and large chunks are red.  The cameras' (simulated) 'floating pixels' along discontinuties
+result in a scattering of unidentified voxels.
+
+In the simulated camera image the person's sleeves are treated as if they were invisible
+to the camera's wavelength, which is true of some materials.
+
+The top-down map can show different views of the voxel data.  Here is shows the types of
+voxels in each column.
 
 ## What's in the box
 
@@ -23,12 +45,12 @@ This generates the simulated images.  It receives scene data (robot joint positi
 avatar position, and so on) from the GUI part of `core/core`.
 The generated images are send to `sim/sim` using UDP.  This app is also used to create the background depth images used by `static/voxel-data-app`.
 
-### static/voxel-data-app
+### `static/voxel-data-app`
 This calculates which voxels each pixel of each camera sees.  The results are
 saved in a file for use by `core/core`.  Background images created by `sim/sim`
 are used to ignore voxels occupied by fixed objects in the scene.
 
-### static/mesh-app
+### `static/mesh-app`
 This creates the STL files for the test scene.
 
 ## Simulation
@@ -67,7 +89,8 @@ https://github.com/ros-industrial/abb_experimental/tree/kinetic-devel/abb_irb670
 
 My laptop has eight threads (four cores).  When running with eight simulated cameras, the code uses one thread
 for the simulation, one thread for predicting robot positions, and four threads for image processing.  This
-leaves two for everything else.  Running this way reconstructing a scene from eight images takes about 15ms.
+leaves two for everything else.  Running this way reconstructing a scene from eight images takes about 15ms
+on my laptop.
 
 ## Files
 
@@ -88,7 +111,7 @@ There are a number of other files containing utilities, experiments, etc.
 
 - simulation
   - sim/main.cpp                main loop for the simulation app
-  - util/raster.cpp             create camera images from 3D meshes
+  - util/raster.cpp             create camera images from triangle meshes
   - robot/robot.cpp             calculating a robot's pose from joint angles
   - robot/urdf.cpp              reading unified robotics description formaf (URDF) files
   - static/mesh-app.cpp         generating STL files for backgrounds and objects
