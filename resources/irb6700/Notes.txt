@@ -1,0 +1,4 @@
+This is the irb6700-200.  The URDF and STL files are from
+https://github.com/ros-industrial/abb_experimental/abb_irb6700_support
+which is covered by the Apache 2.0 license.
+

@@ -1,0 +1,171 @@
+<?xml version="1.0"?>
+<!-- The join limit numbers are in degrees or degrees per second.  The URDF
+     spec says that they should be in radians, but it seems less error-prone
+     if we do the conversion when the numbers are read in. -->
+<robot name="abb_irb6700_200">
+    <!-- link list -->
+    <link name="base_link">
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+          <mesh filename="base_link.stl" />
+        </geometry>
+      </visual>
+    </link>
+    <link name="link_1">
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+          <mesh filename="link_1.stl" />
+        </geometry>
+      </visual>
+    </link>
+<!-- Can't handle dependent joints yet.
+    <link name="cylinder">
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+          <mesh filename="cylinder.stl" />
+        </geometry>
+      </visual>
+    </link>
+    <link name="piston">
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+          <mesh filename="piston.stl" />
+        </geometry>
+      </visual>
+    </link>
+-->
+    <link name="link_2">
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+          <mesh filename="link_2.stl" />
+        </geometry>
+      </visual>
+    </link>
+    <link name="link_3">
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+          <mesh filename="link_3.stl" />
+        </geometry>
+      </visual>
+    </link>
+    <link name="link_4">
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+          <mesh filename="link_4.stl" />
+        </geometry>
+      </visual>
+    </link>
+    <link name="link_5">
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+          <mesh filename="link_5.stl" />
+        </geometry>
+      </visual>
+    </link>
+    <link name="link_6">
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+          <mesh filename="link_6.stl" />
+        </geometry>
+      </visual>
+    </link>
+
+    <joint name="joint_1" type="revolute">
+      <origin xyz="0 0 0.78" rpy="0 0 0" />
+      <parent link="base_link" />
+      <child link="link_1" />
+      <axis xyz="0 0 1" />
+      <limit lower="-170" upper="170" effort="0" velocity="110" />
+    </joint>
+    <joint name="joint_2" type="revolute">
+      <origin xyz="0.32 0 0" rpy="0 0 0" />
+      <parent link="link_1" />
+      <child link="link_2" />
+      <axis xyz="0 1 0" />
+      <limit lower="-65" upper="85" effort="0" velocity="110" />
+    </joint>
+    <joint name="joint_3" type="revolute">
+      <origin xyz="0 0 1.125" rpy="0 0 0" />
+      <parent link="link_2" />
+      <child link="link_3" />
+      <axis xyz="0 1 0" />
+      <limit lower="-180" upper="70" effort="0" velocity="110" />
+    </joint>
+    <joint name="joint_4" type="revolute">
+      <origin xyz="0 0 0.2" rpy="0 0 0" />
+      <parent link="link_3" />
+      <child link="link_4" />
+      <axis xyz="1 0 0" />
+      <limit lower="-300" upper="300" effort="0" velocity="190" />
+    </joint>
+    <joint name="joint_5" type="revolute">
+      <origin xyz="1.1425 0 0" rpy="0 0 0" />
+      <parent link="link_4" />
+      <child link="link_5" />
+      <axis xyz="0 1 0" />
+      <limit lower="-130" upper="130" effort="0" velocity="150" />
+    </joint>
+    <joint name="joint_6" type="revolute">
+      <origin xyz="0.2 0 0" rpy="0 0 0" />
+      <parent link="link_5" />
+      <child link="link_6" />
+      <axis xyz="1 0 0" />
+      <limit lower="-360" upper="360" effort="0" velocity="210" />
+    </joint>
+<!-- Can't handle dependent joints yet.
+    <joint name="cylinder_joint" type="revolute">
+      <origin xyz="-0.349 -0.194 -0.142" rpy="0 0 0" />
+      <parent link="link_1" />
+      <child link="cylinder" />
+      <axis xyz="0 1 0" />
+      <mimic joint="joint_2" multiplier="-0.25"/>
+      <limit lower="-16.25" upper="21.25" effort="0" velocity="100" />
+    </joint>
+    <joint name="piston_joint" type="prismatic">
+      <origin xyz="0 0 0" rpy="0.20897 0 -1.570796" />
+      <parent link="cylinder" />
+      <child link="piston" />
+      <axis xyz="0 1 0" />
+      <mimic joint="joint_2" multiplier="0.15"/>
+      <limit lower="-0.25" upper="0.25" effort="0" velocity="100" />
+    </joint>
+-->
+    <!-- ROS-Industrial 'base' frame: base_link to ABB World Coordinates transform -->
+<!--
+    <link name="base" />
+    <joint name="base_link-base" type="fixed">
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <parent link="base_link"/>
+      <child link="base"/>
+    </joint>
+-->
+
+    <!-- ROS-Industrial 'flange' frame: attachment point for EEF models -->
+<!-- Can't handle fixed joints.
+    <link name="flange"/>
+    <joint type="fixed" name="joint_6-flange">
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <parent link="link_6"/>
+      <child link="flange"/>
+    </joint>
+-->
+
+    <!-- ROS-Industrial 'tool0' frame: all-zeros tool frame -->
+<!--- No mesh.
+    <link name="tool0" />
+    <joint name="link_6-tool0" type="fixed">
+      <origin xyz="0 0 0" rpy="0 1.570796 0" />
+      <parent link="flange" />
+      <child link="tool0" />
+    </joint>
+-->
+</robot>

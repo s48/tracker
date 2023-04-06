@@ -1,0 +1,43 @@
+<?xml version="1.0" ?>
+<robot name="person">
+  <!-- LINKS -->
+  <link name="person">
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="person.stl"/>
+      </geometry>
+    </visual>
+  </link>
+  <link name="left_arm">
+    <visual>
+      <origin rpy="0 0 0" xyz="0.202 -0.031 -1.39"/>
+      <geometry>
+        <mesh filename="left_arm.stl"/>
+      </geometry>
+    </visual>
+  </link>
+  <link name="right_arm">
+    <visual>
+      <origin rpy="0 0 0" xyz="-0.202 -0.031 -1.39"/>
+      <geometry>
+        <mesh filename="right_arm.stl"/>
+      </geometry>
+    </visual>
+  </link>
+  <!-- END LINKS -->
+  <!-- JOINTS -->
+  <joint name="left_shoulder" type="revolute">
+    <origin rpy="0 0 0" xyz="-0.202 0.031 1.39"/>
+    <parent link="person"/>
+    <child link="left_arm"/>
+    <axis xyz="-1 0 0"/>
+  </joint>
+  <joint name="right_shoulder" type="revolute">
+    <origin rpy="0 0 0" xyz="0.202 0.031 1.39"/>
+    <parent link="person"/>
+    <child link="right_arm"/>
+    <axis xyz="-1 0 0"/>
+  </joint>
+  <!-- END JOINTS -->
+</robot>

@@ -1,0 +1,61 @@
+
+{
+    // volume of interest
+    "min": [-2.0, -3.5, 0.0],
+    "max": [3.5, 2.5, 2.0],
+
+    "layout": "layout.stl",
+    "column_data_file": "columns.dat",
+    "viewpoint": [2.30, 0.00, 2.89], // long, lat, radius
+    "avatar": {
+        "position": [0.4, -2.7, 0.0],
+        "rotation": 3.14
+    },
+    "robot": {
+        "urdf": "irb6700/irb6700.urdf",
+        "robot_sprites": "irb6700/robot-sprite.dat",
+        "end_effector_sprites": "irb6700/end-effector-sprite.dat"
+    },
+    "cameras": [
+        { "background": "background0.dat",
+          "port": 5678,
+          "position": [-2.0, -3.5, 3.7],
+          "rpy": [-2.699806, 3.092506, -3.877903]
+        },
+        { "background": "background1.dat",
+          "port": 5679,
+          "position": [-2.0, -0.5, 3.7],
+          "rpy": [9.866566, 3.141593, 1.718058]
+        },
+        { "background": "background2.dat",
+          "port": 5680,
+          "position": [-2.0, 2.5, 3.7],
+          "rpy": [0.441787, -0.000000, 3.926991]
+        },
+        { "background": "background3.dat",
+          "port": 5681,
+          "position": [0.0, 2.5, 3.7],
+          "rpy": [0.441786, 0.049087, -2.748893]
+        },
+        { "background": "background4.dat",
+          "port": 5682,
+          "position": [3.5, 2.5, 3.7],
+          "rpy": [0.441786, 0.000000, -3.926991]
+        },
+        { "background": "background5.dat",
+          "port": 5683,
+          "position": [3.5, -0.5, 3.7],
+          "rpy": [0.441786, 6.283186, 1.570796]
+        },
+        { "background": "background6.dat",
+          "port": 5684,
+          "position": [3.5, -3.5, 3.7],
+          "rpy": [0.441786, 0.000000, 0.785398]
+        },
+        { "background": "background7.dat",
+          "port": 5685,
+          "position": [0.0, -3.5, 3.7],
+          "rpy": [0.490873, 0.000000, 0.000000]
+        }
+    ]
+}
