@@ -13,24 +13,25 @@ Empty voxels are only represented by their absence.
 
 ## Screen shots
 
-Here are two screenshots, one of the ![perspective display](./screenshots/display.png) and the
-other showing a ![raw simulated image](./screenshots/camera.png).  There is also an 
-![MP4 capture](./screenshots/demo.mp4).  The scene contains a robot,
-a person, and some tables and shelves.  In both there are eight camera
-image thumbnails along the bottom and a top-down map at the upper right.  The voxels are
-5cm on a side.
-
-In the perspective
-view gray voxels are unmoving background objects, including the robots base, and blue are the
+Here is a screenshot of the perspective display.
+![perspective display](./screenshots/display.png)
+The scene contains a robot, a person, and some tables and shelves.
+There are eight camera image thumbnails along the bottom and a top-down map at the upper right.
+The voxels are 5cm on a side.
+In the perspective view
+gray voxels are unmoving background objects, including the robot's base, and blue are the
 robot's position as derived from its joint angles.  Small chunks of unoccupied voxels are green
 and large chunks are red.  The cameras' (simulated) 'floating pixels' along discontinuties
 result in a scattering of unidentified voxels.
-
-In the simulated camera image the person's sleeves are treated as if they were invisible
-to the camera's wavelength, which is true of some materials.
-
 The top-down map can show different views of the voxel data.  Here is shows the types of
 voxels in each column.
+
+Here is a second screenshot showing a full camera image.
+![raw simulated image](./screenshots/camera.png)
+The person's sleeves are treated as if they were invisible
+to the camera's wavelength, which is true of some materials.
+
+There is also an [MP4 capture](./screenshots/demo.mp4). 
 
 ## What's in the box
 
