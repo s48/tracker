@@ -587,100 +587,6 @@ Blob* mergeBlobs(ThreadPool& threadPool)
 
 //----------------------------------------------------------------
 
-static Floor8 occupancy;
-static DistanceMap occupiedDistances;
-
-// This should be inside updateOccupancy(), but putting it there
-// hits some compiler weirdness that causes its value to be reset
-// to zero in the middle of the final loop.
-static uint16_t closest;
-
-static uint32_t updateOccupancy(Blob *allBlobs)
-{
-    occupiedDistances.setOpenDefault(false);
-    occupiedDistances.reinitialize();
-
-    // Clear 'unknown'.  Only 'occupied' is preserved from one turn to
-    // the next.  We leave it in until now so that it shows up if the
-    // occupancy is printed.
-    for (uint32_t i; i < floorSize * floorSize; i++) {
-        occupancy[i] &= ~voxelUnknown;
-    }
-
-    // Add an entrance (this should be in the config file).
-    // for (uint32_t i = 140; i < 155; i++) {
-    //   occupancy[floorIndex(20, i)] = voxelOccupied |voxelUnknown;
-    // }
-
-    for (Blob *blob = allBlobs; blob != nullptr; blob = blob->mNext) {
-        if (blob->mVolume < sizeOfABreadbox) {
-            // too small, ignore it
-        } else if (blob->mType == voxelOccupied) {
-            blob->walkIntervals([](Interval& interval)
-                    {
-                        uint32_t index = floorIndex(interval.mX, interval.mY);
-                        occupancy[index] |= voxelOccupied | voxelUnknown;
-                        occupiedDistances.setOccupied(index);
-                    });
-        } else if (blob->mType == voxelUnknown) {
-            blob->walkIntervals([](Interval& interval) 
-                    {
-                        uint32_t index = floorIndex(interval.mX, interval.mY);
-                        occupancy[index] |= voxelUnknown;
-                        occupiedDistances.setOpen(index);
-                    });
-        }
-    }
-
-    if (false && debugPrint) {
-        occupiedDistances.print();
-        debugPrint = false;
-    }
-    occupiedDistances.propagateDistances();
-    if (false && debugPrint) {
-        occupiedDistances.print();
-        debugPrint = false;
-    }
-
-    closest = 0;
-    uint16_t distance = 0xFFFF;
-    for (uint32_t i; i < floorSize * floorSize; i++) {
-        uint8_t state = occupancy[i];
-        if (state == voxelOccupied) {
-            // There was something here last turn, but not now.
-            occupancy[i] = 0;
-        } else if (state == voxelUnknown
-                   && occupiedDistances.distance(i) <= 3) {
-            // Allow for movement into unknown areas.
-            occupancy[i] = voxelOccupied;
-        }
-
-        // Find the occupied square closest to the robot.
-        if ((occupancy[i] & voxelOccupied)
-            && robotDistances.distance(i) < distance) {
-            closest = i;
-            distance = robotDistances.distance(i);
-        }
-    }
-
-    return closest;
-}
-
-uint32_t checkRobotDistances(Blob *allBlobs)
-{
-    if (! robotDistances.empty()) {
-        return updateOccupancy(allBlobs);
-    } else {
-        if (false && debugPrint) {
-            fprintf(stderr, "[no distances]\n");
-            debugPrint = false;
-        }
-        return 0;
-    }
-}
-
-//----------------------------------------------------------------
-
 static const uint32_t smallColors[] = {
     0,
     0x0000FF, // robot is blue
@@ -746,9 +652,7 @@ static const char* voxelTypeNames[] = {
 };
 
 // Various ways of displaying the current state.
-void showFloor(Blob *allBlobs,
-               uint32_t closestMaybeOccupied,
-               std::vector<uint32_t>& floorImageData)
+void showFloor(Blob *allBlobs, std::vector<uint32_t>& floorImageData)
 {
     if (printBlobs) {
         for (uint8_t i = 0; i < voxelTypeCount; i++) {
@@ -780,23 +684,9 @@ void showFloor(Blob *allBlobs,
         printRays = false;
     }
 
-    bool showRobotLine = 0 < robotSpriteLevel;
     switch (floorShow) {
-    case Show::maybeOccupied:
-        for (uint32_t i; i < floorSize * floorSize; i++) {
-            uint8_t state = occupancy[i];
-            uint32_t color = 0;
-            if (state & voxelOccupied) {
-                color = 0xFF0000;
-            } else if (state & voxelUnknown) {
-                color = 0x00FF00;
-            }
-            setFloorPixel(i, color);
-        }
-        break;
     case Show::layer:
     case Show::layerBlobs: {
-        showRobotLine = false;
         uint16_t i = 0;
         for (Blob *blob = allBlobs; blob != nullptr; blob = blob->mNext, i++) {
             if (floorShow == Show::layerBlobs) {
@@ -858,17 +748,6 @@ void showFloor(Blob *allBlobs,
                 blob->color(smallColors);
             }
         }
-    }
-
-    if (showRobotLine && closestMaybeOccupied != 0) {
-        uint16_t robotX;
-        uint16_t robotY;
-        std::tie(robotX, robotY) = robotDistances.reversePath(closestMaybeOccupied);
-        drawLine(closestMaybeOccupied % floorSize,
-                 closestMaybeOccupied / floorSize,
-                 robotX,
-                 robotY,
-                 [](uint8_t x, uint8_t y) { setFloorPixel(x, y, 0xFFFFFF); });
     }
 
     // Run-length encoding of the floor image.

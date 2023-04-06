@@ -461,14 +461,6 @@ void keyCallback(GLFWwindow*, // window
         arrowKeyAction = floorShow == Show::layer ? &layerMode : nullptr;
         updateShow();
         break;
-    case GLFW_KEY_M:
-        // Toggle between columns and maybeOccupied.
-        floorShow = (floorShow == Show::combined
-                     ? Show::maybeOccupied
-                     : Show::combined);
-        arrowKeyAction = nullptr;
-        updateShow();
-        break;
     case GLFW_KEY_O:
         printClouds = true;
         break;

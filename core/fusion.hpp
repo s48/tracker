@@ -52,8 +52,6 @@ Blob *mergeBlobs(ThreadPool& threadPool);
 uint32_t checkRobotDistances(Blob *allBlobs);
 
 // 5. Display the final result.
-void showFloor(Blob *allBlobs,
-               uint32_t closestMaybeOccupied,
-               std::vector<uint32_t>& floorImageData);
+void showFloor(Blob *allBlobs, std::vector<uint32_t>& floorImageData);
 
 #endif // FUSION_HPP

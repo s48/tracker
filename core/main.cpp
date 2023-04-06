@@ -389,15 +389,12 @@ static void processImageSet(ThreadPool &threadPool, Robot& robot) {
             printClouds = false;
         }
 
-        // All of the calculation boils down to this one number.
-        uint32_t closestMaybeOccupied = checkRobotDistances(allBlobs);
-
         uint32_t occupyTime = timeMs() - sectionStartTime;
         sectionStartTime = timeMs();
 
         // Update the floor image.  This also isn't part of the core
         // functionality, but it is quick.
-        showFloor(allBlobs, closestMaybeOccupied, floorImageData);
+        showFloor(allBlobs, floorImageData);
 
         uint32_t showTime = timeMs() - sectionStartTime;
 
