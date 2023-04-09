@@ -61,7 +61,6 @@ struct Interval {
         moments.z() += weight * (float) (mMaxZ + mMinZ) / 2.0f;
     }
 
-    uint16_t robotDistance();
     void addData(std::vector<uint16_t>& data);
 };
 
@@ -106,12 +105,6 @@ struct Blob {
     // The bounding box of the blob's voxels.
     Vector3ui16 mMin;
     Vector3ui16 mMax;
-
-    // The minimum distance from one of the blob's to the robot,
-    // and the coordinates of that closest voxel.
-    uint16_t mRobotDistance;
-    uint16_t mRobotX;
-    uint16_t mRobotY;
 
     Blob():
         mParent(nullptr),
@@ -170,9 +163,6 @@ struct Blob {
     {
         walkIntervals([colors, level](Interval& interval) { interval.color(colors, level); });
     }
-
-    // Find the shortest distance from this to the robot.
-    void setRobotDistance();
 
     // The blob's center of mass.  Not currently used for anything.
     Eigen::Vector3i centerOfMass();

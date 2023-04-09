@@ -2,7 +2,7 @@
 
 #include "cruft.hpp"
 #include "display.hpp"
-#include "fusion.hpp" // robotDistances
+#include "fusion.hpp" // setFloorPixel
 #include "blob.hpp"
 
 #include <Eigen/Core>
@@ -22,11 +22,6 @@ static const char * intervalTypeChars = "-RB-X---E-------?---------------O";
 Floor8 intervalCounts;
 Floor32 intervalStarts;
 Interval intervals[maxIntervals];
-
-uint16_t Interval::robotDistance()
-{
-  return robotDistances.distance(mX, mY);
-};
 
 static inline Interval * intervalBase(const uint32_t x, const uint32_t y)
 {
@@ -148,21 +143,6 @@ void Blob::merge(Blob *other)
         other->mIntervals->mNext = temp;
         mergeCount += 1;
     }
-}
-
-// Find the shortest distance from this to the robot.
-void Blob::setRobotDistance()
-{
-    mRobotDistance = floorCount;
-    walkIntervals([&](Interval& interval)
-                      {
-                          uint16_t d = interval.robotDistance();
-                          if (d < mRobotDistance) {
-                              mRobotDistance = d;
-                              mRobotX = interval.mX;
-                              mRobotY = interval.mY;
-                          }
-                      });
 }
 
 // The blob's center of mass.  Not currently used for anything.
