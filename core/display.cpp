@@ -75,7 +75,29 @@ static Pane cameraPanes[] = {
   {160 * 7, 0, 160, 120},
   {160 * 8, 0, 160, 120}
 };
+/*
+// New laptop is 2256x1504 (3/2) (2256 = (* 47 16 3))
+// It will do 1920x1080 and up to 1920x1440.
 
+static const uint32_t windowWidth = 2256;
+static const uint32_t windowHeight = 1504;
+static const uint32_t cameraPaneHeight = 120;
+static const uint32_t cameraPaneWidth = 160;
+
+static Pane mainPane = {0, cameraPaneHeight, 800, 600};
+static Pane floorPane = {800, cameraPaneHeight, 480, 640};
+static Pane cameraPanes[] = {
+  {0,                   0, cameraPaneWidth, cameraPaneHeight},
+  {cameraPaneWidth,     0, cameraPaneWidth, cameraPaneHeight},
+  {cameraPaneWidth * 2, 0, cameraPaneWidth, cameraPaneHeight},
+  {cameraPaneWidth * 3, 0, cameraPaneWidth, cameraPaneHeight},
+  {cameraPaneWidth * 4, 0, cameraPaneWidth, cameraPaneHeight},
+  {cameraPaneWidth * 5, 0, cameraPaneWidth, cameraPaneHeight},
+  {cameraPaneWidth * 6, 0, cameraPaneWidth, cameraPaneHeight},
+  {cameraPaneWidth * 7, 0, cameraPaneWidth, cameraPaneHeight},
+  {cameraPaneWidth * 8, 0, cameraPaneWidth, cameraPaneHeight}
+};
+*/
 //----------------------------------------------------------------
 // To make the staggered squares work we write each pixel as a square
 // of four screen pixels, with every other column shifted down by one

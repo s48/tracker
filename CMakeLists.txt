@@ -11,8 +11,10 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 # From https://stackoverflow.com/questions/5922016/cmake-cant-find-eigen3
 find_package( PkgConfig )
-pkg_check_modules( EIGEN3 REQUIRED eigen3 )
-include_directories( ${EIGEN3_INCLUDE_DIRS} )
+#pkg_check_modules( EIGEN3 REQUIRED eigen3 )
+#include_directories( ${EIGEN3_INCLUDE_DIRS} )
+include_directories ( /usr/include/eigen3 )
+
 
 pkg_search_module(GLFW REQUIRED glfw3)
 include_directories( ${GLFW_INCLUDE_DIRS} )

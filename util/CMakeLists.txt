@@ -32,8 +32,8 @@ add_executable (pixel-test pixel-test.cpp)
 target_include_directories(pixel-test PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries (pixel-test LINK_PUBLIC util)
 
-find_package(PCL 1.2 REQUIRED)
+#find_package(PCL 1.2 REQUIRED)
 
-add_executable (pcd-viewer pcd-viewer.cpp)
-target_include_directories(pcd-viewer PUBLIC ${PCL_INCLUDE_DIRS})
-target_link_libraries (pcd-viewer LINK_PUBLIC ${PCL_LIBRARIES})
+#add_executable (pcd-viewer pcd-viewer.cpp)
+#target_include_directories(pcd-viewer PUBLIC ${PCL_INCLUDE_DIRS})
+#target_link_libraries (pcd-viewer LINK_PUBLIC ${PCL_LIBRARIES})

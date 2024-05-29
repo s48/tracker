@@ -379,6 +379,7 @@ static void processImageSet(ThreadPool &threadPool, Robot& robot) {
         // Draw the perspective image.  This should be done by a separate
         // process, as it takes a while and isn't part of the core functionality.
         allBlobs->writeToVector(blobData);
+        // printf("blobData %ld uint16s\n", blobData.size());
         renderBlobs(blobData);
 
         // Write out the images as point clouds if asked for by the GUI.
