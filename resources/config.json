@@ -1,5 +1,6 @@
 
 {
+    "voxel_size_cm": 5,
     // volume of interest
     "min": [-2.0, -3.5, 0.0],
     "max": [3.5, 2.5, 2.0],

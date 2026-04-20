@@ -126,6 +126,9 @@ namespace {
     link->name = name;
 
     auto visualXml = linkXml->FirstChildElement("visual");
+    if (visualXml == nullptr) {
+      return link;
+    }
     auto geometryXml = getChildElement(visualXml, "geometry", name);
     auto meshXml = geometryXml->FirstChildElement("mesh");
     if (meshXml == nullptr) {

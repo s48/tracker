@@ -22,6 +22,10 @@ int32_t timeMs(void)
   return std::chrono::duration_cast<std::chrono::milliseconds>(duration).count();
 }
 
+float voxelSizeInM = 0.05f;
+float voxelSizeInCm = 5.0f;
+float voxelsPerMeter = 20.0f;
+
 Eigen::Vector3f cellMinM;
 Eigen::Vector3f cellCenterM;
 Eigen::Vector3i cellMin;
@@ -32,6 +36,9 @@ uint32_t floorCount;
 
 void setCellDimensions(const nlohmann::json& config)
 {
+    voxelSizeInCm = config["voxel_size_cm"].get<float>();
+    voxelSizeInM = voxelSizeInCm / 100.0f;
+    voxelsPerMeter = 100.0f / voxelSizeInCm;
     cellMinM = toVec<Eigen::Vector3f>(config["min"]);
     Eigen::Vector3f fmax = toVec<Eigen::Vector3f>(config["max"]);
     cellCenterM = (cellMinM  + fmax) / 2.0f;

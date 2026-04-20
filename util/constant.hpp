@@ -7,9 +7,9 @@
 
 const int maxCameras = 8;
 
-const float voxelSizeInM = 0.05f;
-const float voxelSizeInCm = (voxelSizeInM * 100.0f);
-const float voxelsPerMeter = (1 / voxelSizeInM);
+extern float voxelSizeInM;
+extern float voxelSizeInCm;
+extern float voxelsPerMeter;
 
 const float maxCameraRangeInM = 8.0f;
 
