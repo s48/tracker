@@ -75,13 +75,13 @@ static std::vector<Eigen::Vector3f> voxelTriangles;
 
 void makeVoxels(void)
 {
-  // *0.8 because we don't want to count rays that just clip the outside edge of
-  // a voxel.
-  voxelTriangles = makeVoxelTriangles(voxelSizeInM * 0.8);
+    // *0.8 because we don't want to count rays that just clip the outside edge of
+    // a voxel.
+    voxelTriangles = makeVoxelTriangles(voxelSizeInM * 0.8);
 
-  fprintf(stderr, "(%d %d %d) (%d %d %d)\n",
-          cellMin.x(), cellMin.y(), cellMin.z(),
-          cellMax.x(), cellMax.y(), cellMax.z());
+    fprintf(stderr, "(%d %d %d) (%d %d %d)\n",
+            cellMin.x(), cellMin.y(), cellMin.z(),
+            cellMax.x(), cellMax.y(), cellMax.z());
     for (int y = cellMin.y(); y < cellMax.y(); y++) {
         for (int x = cellMin.x(); x < cellMax.x(); x++) {
             float yf = y;
@@ -99,10 +99,10 @@ void makeVoxels(void)
 
     uint32_t pixelIndex = 0;
     for (int y = 0; y < imageHeight; y++) {
-      for (int x = 0; x < imageWidth; x++) {
-        pixelRanks[pixelIndex] = pixelRank(x, y);
-        pixelIndex += 1;
-      }
+        for (int x = 0; x < imageWidth; x++) {
+            pixelRanks[pixelIndex] = pixelRank(x, y);
+            pixelIndex += 1;
+        }
     }
 }
 
@@ -136,8 +136,8 @@ const float voxelRadiusInCm = 3.0f;
 
 void CameraRays::makeCameraRays(void)
 {
-    // Statistics: pixelCounts[n] is the of voxels that were projected
-    // onto n pixels.
+    // Statistics: pixelCounts[n] is the number of voxels that were
+    // projected onto n pixels.
     std::vector<int32_t> pixelCounts(10000);
 
     // Find which rays intersect each voxel.

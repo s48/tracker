@@ -19,6 +19,8 @@
 #include <fstream>
 #include <chrono>
 #include <cstring>
+#include <algorithm>
+#include <sstream>
 
 #include <optionparser.h>
 #include <signal.h>
@@ -33,6 +35,21 @@
 #include <Eigen/Geometry>
 
 bool exitFlag = false;
+
+static uint32_t frameNumber = 0;
+
+static bool isRecording = false;
+static std::ofstream recordStream;
+
+static bool isReplaying = false;
+
+struct ReplayEvent {
+    uint32_t frame;
+    bool isMouse;
+    int32_t args[3];
+};
+static std::vector<ReplayEvent> replayEvents;
+static size_t replayIndex = 0;
 
 // Exit handler
 void exit_handler(int)
@@ -50,10 +67,20 @@ static void signalHandler(int /* signo */)
 static char mouseMode = 0;
 static int32_t previousMouse[2];
 
-static void modeCommand(const CommandArguments &arguments) 
+static void applyMode(int32_t mode)
 {
-    mouseMode = arguments.int32At(0);
+    mouseMode = mode;
     fprintf(stderr, "[mode %d]\n", mouseMode);
+}
+
+static void modeCommand(const CommandArguments &arguments)
+{
+    int32_t mode = arguments.int32At(0);
+    if (isRecording) {
+        recordStream << frameNumber << " mode " << mode << "\n";
+        recordStream.flush();
+    }
+    applyMode(mode);
 }
 
 // The avatar is a human figure that can be moved around the scene.
@@ -76,12 +103,8 @@ static void debugCommand(const CommandArguments &arguments)
     debugPrint = true;
 }
 
-static void mouseCommand(const CommandArguments &arguments) 
+static void applyMouse(int32_t x, int32_t y, int32_t scroll)
 {
-    int32_t x = arguments.int32At(0);
-    int32_t y = arguments.int32At(1);
-    int32_t scroll = arguments.int32At(2);
-
     switch (mouseMode) {
     case 0:  // nothing
     case 1:  // nothing
@@ -138,6 +161,18 @@ static void mouseCommand(const CommandArguments &arguments)
     previousMouse[1] = y;
 }
 
+static void mouseCommand(const CommandArguments &arguments)
+{
+    int32_t x = arguments.int32At(0);
+    int32_t y = arguments.int32At(1);
+    int32_t scroll = arguments.int32At(2);
+    if (isRecording) {
+        recordStream << frameNumber << " mouse " << x << " " << y << " " << scroll << "\n";
+        recordStream.flush();
+    }
+    applyMouse(x, y, scroll);
+}
+
 // Rotate the robot by a fixed amount.
 static void rotateCommand(const CommandArguments &arguments)
 {
@@ -168,7 +203,18 @@ const std::vector<CommandSpec>displayCommandTable = {
   { "debug",  "",    debugCommand }
 };
 
-CommandInterpreter displayCommands = {displayCommandTable};
+// Do nothing.
+static void nullCommand(const CommandArguments &arguments) {}
+
+const std::vector<CommandSpec>replayCommandTable = {
+  { "mode",   "i",   nullCommand },
+  { "mouse",  "iii", nullCommand },
+  { "rotate", "i",   nullCommand },
+  { "camera", "iii", nullCommand },
+  { "start",  "",    startCommand },
+  { "stop",   "",    stopCommand },
+  { "debug",  "",    debugCommand }
+};
 
 const std::vector<CommandSpec>coreCommandTable = {
   { "rotate", "i",   rotateCommand }
@@ -516,7 +562,7 @@ static void cameraCommand(const CommandArguments &arguments)
 }
 
 //----------------------------------------------------------------
-enum optionIndex { UNKNOWN, HELP, BACKGROUNDS, CONFIG_FILE, CADENCE, ADJUST };
+enum optionIndex { UNKNOWN, HELP, BACKGROUNDS, CONFIG_FILE, CADENCE, ADJUST, RECORD, REPLAY };
 
 const option::Descriptor usage[] = 
     {{UNKNOWN, 0, "", "", option::Arg::None,
@@ -531,7 +577,58 @@ const option::Descriptor usage[] =
       "--configfile filename \tconfiguration file."},
      {ADJUST, 0, "", "adjust", option::Arg::None,
       "--adjust \tadjust camera aim."},
+     {RECORD, 0, "", "record", option::Arg::Optional,
+      "--record filename \tRecord mode and mouse commands to file."},
+     {REPLAY, 0, "", "replay", option::Arg::Optional,
+      "--replay filename \tReplay recorded mode and mouse commands from file."},
      {0, 0, nullptr, nullptr, nullptr, nullptr}};
+
+static void loadReplayFile(const std::string& filename)
+{
+    std::ifstream commands(filename);
+    if (!commands.is_open()) {
+        fprintf(stderr, "Cannot open replay file '%s'.\n", filename.c_str());
+        exit(1);
+    }
+    std::string line;
+    while (std::getline(commands, line)) {
+        if (line.empty() || line[0] == '#') {
+            continue;
+        }
+        std::istringstream iss(line);
+        uint32_t frame;
+        std::string cmd;
+        if (!(iss >> frame >> cmd)) {
+            fprintf(stderr, "Cannot parse replay line '%s'.\n", line.c_str());
+            exit(1);
+        }
+        ReplayEvent event;
+        event.frame = frame;
+        int argCount;
+        if (cmd == "mode") {
+            event.isMouse = false;
+            argCount = 1;
+        } else if (cmd == "mouse") {
+            event.isMouse = true;
+            argCount = 2;
+        } else {
+            fprintf(stderr, "Unknown command in replay file '%s'.\n", line.c_str());
+            exit(1);
+        }
+        for (int i = 0; i < 3; i++) {
+            if (argCount <= i) {
+                event.args[i] = 0;
+            } else if (!(iss >> event.args[i])) {
+                fprintf(stderr, "Cannot parse replay argument '%s'.\n", line.c_str());
+                exit(1);
+            }
+        }
+        replayEvents.push_back(event);
+    }
+    isReplaying = true;
+    replayIndex = 0;
+    fprintf(stderr, "Loaded %zu replay events from '%s'.\n", replayEvents.size(), filename.c_str());
+}
 
 int main(int argc, char **argv)
 {
@@ -691,11 +788,29 @@ int main(int argc, char **argv)
       return 0;
     }
 
+    const std::vector<CommandSpec> *commandTable = &displayCommandTable;
+
+    if (options[RECORD] != nullptr) {
+        recordStream.open(options[RECORD].arg);
+        if (!recordStream.is_open()) {
+            fprintf(stderr, "Cannot open record file '%s'\n", options[RECORD].arg);
+            return 1;
+        }
+        isRecording = true;
+        fprintf(stderr, "Recording to '%s'\n", options[RECORD].arg);
+    }
+
+    if (options[REPLAY] != nullptr) {
+        loadReplayFile(options[REPLAY].arg);
+        commandTable = &replayCommandTable;
+    }
+
+    CommandInterpreter displayCommands = {*commandTable};
+
     uint16_t cameraCount = cameras.size();
     ThreadPool threadPool(cameraCount - 1);
 
     uint32_t start = timeMs();
-    uint32_t frameNumber = 0;
     
     int coreServerFd = openSocket((char *) "rk-core-to-sim", true);
     int coreFd = -1;
@@ -734,6 +849,16 @@ int main(int argc, char **argv)
             sendData = true;
         } else {
             coreCommands.readCommands(coreServerFd);
+        }
+
+        while (replayIndex < replayEvents.size()
+               && replayEvents[replayIndex].frame <= frameNumber) {
+            const auto& event = replayEvents[replayIndex++];
+            if (event.isMouse) {
+                applyMouse(event.args[0], event.args[1], event.args[2]);
+            } else {
+                applyMode(event.args[0]);
+            }
         }
 
         if (! sendData) {
